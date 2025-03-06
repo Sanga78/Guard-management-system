@@ -1,9 +1,11 @@
-       <!-- Begin Page Content -->
+{% extends 'includes/base.html' %}
+{%block main_content %}
+<!-- Begin Page Content -->
        <div class="container-fluid">
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-          <h1 class="h3 mb-0 text-gray-800"><?= $title; ?></h1>
+          <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
         </div>
 
         <!-- Content Row -->
@@ -16,7 +18,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Departments</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $display['c_department']; ?> Departments</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">"count" Departments</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-building fa-2x text-gray-300"></i>
@@ -32,7 +34,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Working Shifts</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $display['c_shift']; ?> Shifts</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">"count" Shifts</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-exchange-alt fa-2x text-gray-300"></i>
@@ -49,7 +51,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Employees</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $display['c_employee']; ?> Employees</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">"count" Employees</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-id-badge fa-2x text-gray-300"></i>
@@ -66,7 +68,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Users</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $display['c_users']; ?> Active Users</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">"count" Active Users</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-users fa-2x text-gray-300"></i>
@@ -94,7 +96,7 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
                       <div class="dropdown-header">More Details:</div>
-                      <a class="dropdown-item" href="<?= base_url('admin') ?>">Department List</a>
+                      <a class="dropdown-item" href="">Department List</a>
                     </div>
                   </div>
                 </div>
@@ -109,14 +111,13 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <?php $i = 1;
-                       foreach ($d_list as $d) : ?>
+                       
                         <tr>
-                          <th scope="row"><?= $i++ ?></th>
-                          <td><?= $d['d_id'] ?></td>
-                          <td><?= $d['qty'] ?></td>
+                          <th scope="row">id</th>
+                          <td>Department code</td>
+                          <td>quantity</td>
                         </tr>
-                      <?php endforeach; ?>
+
                     </tbody>
                   </table>
                 </div>
@@ -142,37 +143,15 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <?php $i = 1;
-                       foreach ($s_list as $s) : ?>
-                        <?php if ($s['s_id'] == 0) {
-                           continue;
-                         } ?>
+
                         <tr>
-                          <th scope="row"><?= $i++ ?></th>
-                          <td><?= $s['s_id'] ?></td>
-                          <td><?= $s['qty'] ?></td>
+                          <th scope="row">id</th>
+                          <td>shift code</td>
+                          <td>no of employees</td>
                         </tr>
-                      <?php endforeach; ?>
+                      
                     </tbody>
                   </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-4 col-lg-5">
-            <!-- Earnings (Monthly) Card Example -->
-            <div class="col p-0">
-              <div class="card border-left-dark shadow h-100 py-2">
-                <div class="card-body">
-                  <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">4SIMD - Web Programming</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">Andry - 1831006</div>
-                    </div>
-                    <div class="col-auto">
-                      <i class="fas fa-user fa-2x text-gray-300"></i>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -183,3 +162,5 @@
 
       </div>
       <!-- End of Main Content -->
+
+{% endblock main_content %}
