@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 class Department(models.Model):
@@ -21,7 +21,8 @@ class Location(models.Model):
     def __str__(self):
         return self.name
 
-class Employee(models.Model):
+class Guard(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=128)
@@ -29,20 +30,16 @@ class Employee(models.Model):
     image = models.CharField(max_length=128, default='default.png')
     birth_date = models.DateField()
     hire_date = models.DateField()
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
     shift = models.ForeignKey(Shift, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
-class EmployeeDepartment(models.Model):
-    id = models.AutoField(primary_key=True)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-
 class Attendance(models.Model):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=6)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    guard = models.ForeignKey(Guard, on_delete=models.CASCADE)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     shift = models.ForeignKey(Shift, on_delete=models.CASCADE)
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
@@ -54,11 +51,11 @@ class Attendance(models.Model):
     out_time = models.IntegerField()
     out_status = models.CharField(max_length=15)
 
-class User(models.Model):
-    username = models.CharField(max_length=6, primary_key=True)
-    password = models.CharField(max_length=128)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    role_id = models.IntegerField()
+class AdminProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    fullname = models.CharField(max_length=255)
+    email = models.EmailField()
+    updation_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.username
+        return self.fullname
