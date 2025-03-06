@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 class Department(models.Model):
     id = models.CharField(max_length=3, primary_key=True)
+    code = models.CharField(max_length=50, null=True, blank=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -13,6 +14,8 @@ class Shift(models.Model):
     id = models.AutoField(primary_key=True)
     start = models.TimeField()
     end = models.TimeField()
+    def __str__(self):
+            return f"{self.start} to {self.end}"
 
 class Location(models.Model):
     id = models.AutoField(primary_key=True)
@@ -38,7 +41,7 @@ class Guard(models.Model):
 
 class Attendance(models.Model):
     id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=6)
+    name = models.CharField(max_length=6)
     guard = models.ForeignKey(Guard, on_delete=models.CASCADE)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     shift = models.ForeignKey(Shift, on_delete=models.CASCADE)
