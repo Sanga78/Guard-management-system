@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Department(models.Model):
-    id = models.CharField(max_length=3, primary_key=True)
+    id = models.AutoField(primary_key=True)
     code = models.CharField(max_length=50, null=True, blank=True)
     name = models.CharField(max_length=50)
 
@@ -26,11 +26,11 @@ class Location(models.Model):
 
 class Guard(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    id = models.PositiveIntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=128)
     gender = models.CharField(max_length=1)
-    image = models.CharField(max_length=128, default='default.png')
+    image = models.CharField(max_length=128, default='images/pp/default.png')
     birth_date = models.DateField()
     hire_date = models.DateField()
     department = models.ForeignKey(Department, on_delete=models.CASCADE)

@@ -18,7 +18,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Departments</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">"count" Departments</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{departments_count}} Departments</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-building fa-2x text-gray-300"></i>
@@ -34,7 +34,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Working Shifts</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">"count" Shifts</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{shifts_count}} Shifts</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-exchange-alt fa-2x text-gray-300"></i>
@@ -50,8 +50,8 @@
               <div class="card-body">
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Employees</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">"count" Employees</div>
+                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Guards</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{guards_count}} Guards</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-id-badge fa-2x text-gray-300"></i>
@@ -68,7 +68,7 @@
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
                     <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Users</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">"count" Active Users</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{active_user_counts}} Active Users</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-users fa-2x text-gray-300"></i>
@@ -89,7 +89,7 @@
               <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-rowz align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Departments' Employees</h6>
+                  <h6 class="m-0 font-weight-bold text-primary">Departments' Guards</h6>
                   <div class="dropdown no-arrow">
                     <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
@@ -107,17 +107,17 @@
                       <tr>
                         <th scope="col">#</th>
                         <th scope="col">Dept Code</th>
-                        <th scope="col">Employees</th>
+                        <th scope="col">Guards</th>
                       </tr>
                     </thead>
                     <tbody>
-                       
+                      {% for dept in department_guard_counts %}
                         <tr>
-                          <th scope="row">id</th>
-                          <td>Department code</td>
-                          <td>quantity</td>
+                          <th scope="row">{{ forloop.counter }}</th>
+                          <td>{{ dept.department__code }}</td>
+                          <td>{{ dept.guard_count }}</td>
                         </tr>
-
+                        {% endfor %}
                     </tbody>
                   </table>
                 </div>
@@ -139,17 +139,17 @@
                       <tr>
                         <th scope="col">#</th>
                         <th scope="col">Shift Code</th>
-                        <th scope="col">Employees</th>
+                        <th scope="col">Guards</th>
                       </tr>
                     </thead>
                     <tbody>
-
+                      {% for shift in shift_guard_counts %}
                         <tr>
-                          <th scope="row">id</th>
-                          <td>shift code</td>
-                          <td>no of employees</td>
+                          <th scope="row">{{ forloop.counter }}</th>
+                          <td>{{ shift.shift__start }} - {{ shift.shift__end }}</td>
+                          <td>{{ shift.guard_count }}</td>
                         </tr>
-                      
+                        {% endfor %}
                     </tbody>
                   </table>
                 </div>
@@ -159,8 +159,5 @@
         </div>
       </div>
       <!-- /.container-fluid -->
-
-      </div>
-      <!-- End of Main Content -->
 
 {% endblock main_content %}

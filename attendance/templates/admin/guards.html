@@ -1,27 +1,46 @@
+{% extends 'includes/base.html' %}
+{%block main_content %}
+        
         <!-- Begin Page Content -->
         <div class="container-fluid">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800"><?= $title; ?></h1>
+          <h1 class="h3 mb-4 text-gray-800">Guards</h1>
 
           <div class="row">
             <div class="col-lg-3">
-              <a href="<?= base_url('master/a_employee'); ?>" class="btn btn-info btn-icon-split mb-4">
+              <a href="{% url 'add_guard' %}" class="btn btn-info btn-icon-split mb-4">
                 <span class="icon text-white-600">
                   <i class="fas fa-plus-circle"></i>
                 </span>
-                <span class="text">Add New Employee</span>
+                <span class="text">Add New Guard</span>
               </a>
             </div>
             <div class="col-lg-5 offset-lg-4">
-              <?= $this->session->flashdata('message'); ?>
+              {% for m in messages %}
+                {% if m.tags == 'error' %}
+                
+                <div class="alert alert-danger alert-dismissible fade show"><strong>Info: </strong>{{m}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            
+             </div>
+             {% elif m.tags == 'success' %}
+             <div class="alert alert-success alert-dismissible fade show"><strong>Info: </strong>{{m}}
+                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                 </div>
+                 {%endif%}
+                {%endfor%}
             </div>
           </div>
 
           <!-- Data Table employee-->
           <div class="card shadow mb-4">
             <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">DataTables Employee</h6>
+              <h6 class="m-0 font-weight-bold text-primary">DataTables Guard</h6>
             </div>
             <div class="card-body">
               <div class="table-responsive">
@@ -41,40 +60,30 @@
                   </thead>
                 
                   <tbody>
-                    <?php
-                    $i = 1;
-                    foreach ($employee as $emp) :
-                    ?>
-                      <?php if ($emp['shift_id'] == 0) {
-                        continue;
-                      } ?>
+                    {% for guard in guards %}
                       <tr>
-                        <td class=" align-middle"><?= $i++; ?></td>
-                        <td class=" align-middle"><?= $emp['id']; ?></td>
-                        <td class=" align-middle"><?= $emp['name']; ?></td>
-                        <td class=" align-middle"><?= $emp['shift_id']; ?></td>
-                        <td class=" align-middle"><?php if ($emp['gender'] == 'M') {
-                                                    echo 'Male';
-                                                  } else {
-                                                    echo 'Female';
-                                                  }; ?></td>
-                        <td class="text-center"><img src="<?= base_url('images/pp/') . $emp['image']; ?>" style="width: 55px; height:55px" class="img-rounded"></td>
-                        <td class=" align-middle"><?= $emp['birth_date']; ?></td>
-                        <td class=" align-middle"><?= $emp['hire_date']; ?></td>
+                        <td class=" align-middle">{{forloop.counter}}</td>
+                        <td class=" align-middle">{{guard.id}}</td>
+                        <td class=" align-middle">{{guard.name}}</td>
+                        <td class=" align-middle">{{guard.shift}}</td>
+                        <td class=" align-middle">{{guard.gender}}</td>
+                        <td class="text-center"><img src="{{guard.image.url}}" style="width: 55px; height:55px" class="img-rounded"></td>
+                        <td class=" align-middle">{{guard.birth_date}}</td>
+                        <td class=" align-middle">{{guard.hire_date}}</td>
                         <td class="text-center align-middle">
-                          <a href="<?= base_url('master/e_employee/') . $emp['id'] ?>" class="btn btn-primary btn-circle">
+                          <a href="edit_guard?guardid={{guard.id}}" class="btn btn-primary btn-circle">
                             <span class="icon text-white" title="Edit">
                               <i class="fas fa-edit"></i>
                             </span>
                           </a> |
-                          <a href="<?= base_url('master/d_employee/') . $emp['id'] ?>" class="btn btn-danger btn-circle" onclick="return confirm('Deleted employee will lost forever. Still want to delete?')">
+                          <a href="{%url 'guards' %}?del={{guard.id}}" class="btn btn-danger btn-circle" onclick="return confirm('Deleted employee will lost forever. Still want to delete?')">
                             <span class="icon text-white" title="Delete">
                               <i class="fas fa-trash-alt"></i>
                             </span>
                           </a>
                         </td>
                       </tr>
-                    <?php endforeach; ?>
+                    {% endfor %}
                   </tbody>
                 </table>
               </div>
@@ -83,6 +92,4 @@
 
         </div>
         <!-- /.container-fluid -->
-
-        </div>
-        <!-- End of Main Content -->
+        {%endblock main_content %}

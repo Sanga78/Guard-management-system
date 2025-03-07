@@ -1,33 +1,68 @@
-    <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-info sidebar sidebar-dark accordion" id="accordionSidebar">
+ <!-- Sidebar -->
+ <ul class="navbar-nav bg-gradient-info sidebar sidebar-dark accordion" id="accordionSidebar">
 
-      <!-- Sidebar - Brand -->
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="">
+  <!-- Sidebar - Brand -->
+  <a class="sidebar-brand d-flex align-items-center justify-content-center" href="">
         <div class="sidebar-brand-icon">
           <i class="fas fa-user-check"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">G.M.S</div>
-      </a>
+      <div class="sidebar-brand-text mx-3">G.M.S</div>
+  </a>
 
+  <!-- Divider -->
+  <hr class="sidebar-divider my-0">
 
-      <!-- Query Menu -->
+  <!-- Nav Item - Dashboard -->
+  <li class="nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+      <a class="nav-link" href="{% url 'admin_dashboard' %}">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+          <span>Admin Dashboard</span></a>
+  </li>
 
-        <div class="sidebar-heading">
-          menu title
-        </div>
-            <li class="nav-item active">
-              <li class="nav-item">
-              <a class="nav-link pb-0" href="">
-                <i class=""></i>
-                <span>title</span></a>
-              </li>
-              <hr class="sidebar-divider mt-3">
-        </li>
+  <!-- Divider -->
+  <hr class="sidebar-divider">
 
-        <!-- Sidebar Toggler (Sidebar) -->
-        <div class="text-center d-none d-md-inline">
-          <button class="rounded-circle border-0" id="sidebarToggle"></button>
-        </div>
+ <!-- Nav Item -->
+  <li class="nav-item {% if request.resolver_match.url_name == 'departments' %}active{% endif %}">
+      <a class="nav-link" href="{% url 'departments' %}">
+          <i class="fas fa-building"></i>
+          <span>Departments</span></a>
+  </li>
+  <li class="nav-item {% if request.resolver_match.url_name == 'shifts' %}active{% endif %}">
+    <a class="nav-link" href="{% url 'shifts' %}">
+        <i class="fas fa-exchange-alt"></i>
+        <span>Shifts</span></a>
+  </li>
+  <li class="nav-item {% if request.resolver_match.url_name == 'guards' %}active{% endif %}">
+    <a class="nav-link" href="{% url 'guards' %}">
+        <i class="fas fa-id-badge"></i>
+        <span>Guards</span></a>
+</li>
+<li class="nav-item {% if request.resolver_match.url_name == 'locations' %}active{% endif %}">
+  <a class="nav-link" href="{% url 'locations' %}">
+      <i class="fas fa-map-pin"></i>
+      <span>Locations</span></a>
+</li>
+<li class="nav-item {% if request.resolver_match.url_name == 'list_users' %}active{% endif %}">
+  <a class="nav-link" href="{% url 'list_users' %}">
+      <i class="fas fa-exchange-alt"></i>
+      <span>Users</span></a>
+</li>
 
-    </ul>
-    <!-- End of Sidebar -->
+ <!-- Divider -->
+ <hr class="sidebar-divider">
+ <li class="nav-item">
+  <a class="nav-link" href="">
+      <i class="fas fa-print"></i>
+      <span>Print Report</span></a>
+</li>
+
+  <!-- Divider -->
+  <hr class="sidebar-divider d-none d-md-block">
+
+  <!-- Sidebar Toggler (Sidebar) -->
+  <div class="text-center d-none d-md-inline">
+      <button class="rounded-circle border-0" id="sidebarToggle"></button>
+  </div>
+</ul>
+<!-- End of Sidebar -->

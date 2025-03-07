@@ -1,12 +1,15 @@
+{% extends 'includes/base.html' %}
+{%block main_content %}
+        
         <!-- Begin Page Content -->
         <div class="container-fluid">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800"><?= $title; ?></h1>
+          <h1 class="h3 mb-4 text-gray-800">Shifts</h1>
 
           <div class="row">
             <div class="col-lg-3">
-              <a href="<?= base_url('master/a_shift'); ?>" class="btn btn-info btn-icon-split mb-4">
+              <a href="{% url 'add_shift'%}" class="btn btn-info btn-icon-split mb-4">
                 <span class="icon text-white">
                   <i class="fas fa-plus-circle"></i>
                 </span>
@@ -14,7 +17,23 @@
               </a>
             </div>
             <div class="col-lg-5 offset-lg-4">
-              <?= $this->session->flashdata('message'); ?>
+              {% for m in messages %}
+              {% if m.tags == 'error' %}
+              
+              <div class="alert alert-danger alert-dismissible fade show"><strong>Info: </strong>{{m}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          
+           </div>
+           {% elif m.tags == 'success' %}
+           <div class="alert alert-success alert-dismissible fade show"><strong>Info: </strong>{{m}}
+               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+               </div>
+               {%endif%}
+              {%endfor%}
             </div>
           </div>
 
@@ -36,28 +55,25 @@
                   </thead>
                   
                   <tbody>
-                    <?php
-                    $i = 1;
-                    foreach ($shift as $sft) :
-                    ?>
+                    {% for shift in shifts %}
                       <tr>
-                        <td class="align-middle"><?= $i++; ?></td>
-                        <td class="align-middle"><?= $sft['start']; ?></td>
-                        <td class="align-middle"><?= $sft['end']; ?></td>
+                        <td class="align-middle">{{forloop.counter}}</td>
+                        <td class="align-middle">{{shift.start}}</td>
+                        <td class="align-middle">{{shift.end}}</td>
                         <td class="align-middle text-center">
-                          <a href="<?= base_url('master/e_shift/') . $sft['id'] ?>" class="btn btn-primary btn-circle">
+                          <a href="edit_shift?shiftid={{shift.id}}" class="btn btn-primary btn-circle">
                             <span class="icon text-white" title="Edit">
                               <i class="fas fa-edit"></i>
                             </span>
                           </a> |
-                          <a href="<?= base_url('master/d_shift/') . $sft['id'] ?>" class="btn btn-danger btn-circle" onclick="return confirm('Deleted Shift will lost forever. Still want to delete?')">
+                          <a href="{%url 'shifts' %}?del={{shift.id}}" class="btn btn-danger btn-circle" onclick="return confirm('Deleted Shift will lost forever. Still want to delete?')">
                             <span class="icon text-white" title="Delete">
                               <i class="fas fa-trash-alt"></i>
                             </span>
                           </a>
                         </td>
                       </tr>
-                    <?php endforeach; ?>
+                      {% endfor%}
                   </tbody>
                 </table>
               </div>
@@ -67,5 +83,4 @@
         </div>
         <!-- /.container-fluid -->
 
-        </div>
-        <!-- End of Main Content -->
+        {%endblock main_content %}

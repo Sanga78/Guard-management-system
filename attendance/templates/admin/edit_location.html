@@ -1,17 +1,33 @@
+{% extends 'includes/base.html' %}
+{%block main_content %}
+        
         <!-- Begin Page Content -->
         <div class="container-fluid">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800"><?= $title; ?></h1>
+          <h1 class="h3 mb-4 text-gray-800">{{title}}</h1>
 
-          <a href="<?= base_url('master/location'); ?>" class="btn btn-secondary btn-icon-split mb-4">
+          <a href="{% url 'locations' %}" class="btn btn-secondary btn-icon-split mb-4">
             <span class="icon text-white">
               <i class="fas fa-chevron-left"></i>
             </span>
             <span class="text">Back</span>
           </a>
-
+          <div class="col-lg-5 offset-lg-4">
+            {% for m in messages %}
+            {% if m.tags == 'error' %}
+            
+            <div class="alert alert-danger alert-dismissible fade show"><strong>Info: </strong>{{m}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        
+            </div>
+             {%endif%}
+            {%endfor%}
+          </div>
           <form action="" method="POST" class="col-lg-5  p-0">
+            {% csrf_token %}
             <div class="card">
               <h5 class="card-header">Location Master Data</h5>
               <div class="card-body">
@@ -19,12 +35,11 @@
                 <p class="card-text">Form to edit location in system</p>
                 <div class="form-group">
                   <label class="col-form-label-lg">Location ID</label>
-                  <input type="text" readonly class="form-control-plaintext form-control-lg" name="l_id" value="<?= $l_old['id']; ?>">
+                  <input type="text" readonly class="form-control-plaintext form-control-lg" name="l_id" value="{{ location.id }}">
                 </div>
                 <div class="form-group">
                   <label for="l_name" class="col-form-label-lg">Location Name</label>
-                  <input type="text" class="form-control form-control-lg" name="l_name" id="l_name" value="<?= $l_old['name']; ?>">
-                  <?= form_error('l_name', '<small class="text-danger">', '</small>') ?>
+                  <input type="text" class="form-control form-control-lg" name="l_name" id="l_name" value="{{ location.name }}">
                 </div>
                 <button type="submit" class="btn btn-success btn-icon-split mt-4 float-right">
                   <span class="icon text-white">
@@ -38,6 +53,4 @@
         </form>
         </div>
         <!-- /.container-fluid -->
-
-        </div>
-        <!-- End of Main Content -->
+        {%endblock main_content %}

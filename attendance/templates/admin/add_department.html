@@ -1,17 +1,32 @@
-        <!-- Begin Page Content -->
+{% extends 'includes/base.html' %}
+{%block main_content %}
+<!-- Begin Page Content -->
         <div class="container-fluid">
 
             <!-- Page Heading -->
             <h1 class="h3 mb-4 text-gray-800">Add Department</h1>
   
-            <a href="" class="btn btn-secondary btn-icon-split mb-4">
+            <a href="{% url 'departments' %}" class="btn btn-secondary btn-icon-split mb-4">
               <span class="icon text-white">
                 <i class="fas fa-chevron-left"></i>
               </span>
               <span class="text">Back</span>
             </a>
-  
+            <div class="col-lg-5 offset-lg-4">
+              {% for m in messages %}
+              {% if m.tags == 'error' %}
+              
+              <div class="alert alert-danger alert-dismissible fade show"><strong>Info: </strong>{{m}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          
+              </div>
+               {%endif%}
+              {%endfor%}
+            </div>
             <form action="" method="POST" class="col-lg-5  p-0">
+              {% csrf_token %}
               <div class="card">
                 <h5 class="card-header">Department Master Data</h5>
                 <div class="card-body">
@@ -38,6 +53,4 @@
             </form>
           </div>
           <!-- /.container-fluid -->
-  
-          </div>
-          <!-- End of Main Content -->
+{%endblock main_content %}

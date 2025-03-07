@@ -1,10 +1,12 @@
+{% extends 'includes/base.html' %}
+{%block main_content %}        
         <!-- Begin Page Content -->
         <div class="container-fluid">
 
             <!-- Page Heading -->
-            <h1 class="h3 mb-4 text-gray-800"><?= $title; ?></h1>
+            <h1 class="h3 mb-4 text-gray-800">Edit Department</h1>
   
-            <a href="<?= base_url('master'); ?>" class="btn btn-secondary btn-icon-split mb-4">
+            <a href="{% url 'departments' %}" class="btn btn-secondary btn-icon-split mb-4">
               <span class="icon text-white">
                 <i class="fas fa-chevron-left"></i>
               </span>
@@ -12,6 +14,7 @@
             </a>
   
             <form action="" method="POST" class="col-lg-5  p-0">
+              {% csrf_token %}
               <div class="card">
                 <h5 class="card-header">Department Master Data</h5>
                 <div class="card-body">
@@ -19,12 +22,11 @@
                   <p class="card-text">Form to edit department in system</p>
                   <div class="form-group">
                     <label for="department_id" class="col-form-label-lg">Department ID</label>
-                    <input type="text" readonly class="form-control-plaintext form-control-lg" name="d_id" value="<?= $d_old['id']; ?>">
+                    <input type="text" readonly class="form-control-plaintext form-control-lg" name="deptcode" value="{{department.code}}">
                   </div>
                   <div class="form-group">
                     <label for="d_name" class="col-form-label-lg">Department Name</label>
-                    <input type="text" class="form-control form-control-lg" name="d_name" id="d_name" value="<?= $d_old['name']; ?>">
-                    <?= form_error('d_name', '<small class="text-danger">', '</small>') ?>
+                    <input type="text" class="form-control form-control-lg" name="d_name" id="deptname" value="{{department.name}}">
                   </div>
                   <button type="submit" class="btn btn-success btn-icon-split mt-4 float-right">
                     <span class="icon text-white">
@@ -39,5 +41,4 @@
           </div>
           <!-- /.container-fluid -->
   
-          </div>
-          <!-- End of Main Content -->
+          {%endblock main_content %}
