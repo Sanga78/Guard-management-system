@@ -185,7 +185,7 @@ Contributions are welcome! Please follow these steps:
 
 For questions or feedback, please contact:
 
-- **Your Name**: [kelvinkipkosgeisanga@gmail.com](mailto:kelvinkipkosgeisanga@gmail.com)
+- **Kelvin Kipkosgei**: [kelvinkipkosgeisanga@gmail.com](mailto:kelvinkipkosgeisanga@gmail.com)
 - **GitHub**: [Sanga](https://github.com/Sanga78)
 
 ---
