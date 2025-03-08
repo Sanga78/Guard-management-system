@@ -5,6 +5,7 @@ urlpatterns = [
         path('', views.index, name='login'),
         path('logout/', views.logout, name='logout'),
         path('admin_dashboard', views.admin_dashboard, name='admin_dashboard'),
+        path('admin_change_password/', views.admin_change_password, name='admin_change_password'),
         path('guards', views.guards, name='guards'),
         path('add_guard', views.add_guard, name='add_guard'),
         path('edit_guard', views.edit_guard, name='edit_guard'),
@@ -27,6 +28,7 @@ urlpatterns = [
         #GUARD URLS
         path('guard_attendance', views.guard_attendance, name='guard_attendance'),
         path('guard_profile', views.guard_profile, name='guard_profile'),
+        path('change_password/', views.change_password, name='change_password'),
         path('check-in/', views.check_in, name='check_in'),
         path('check-out/', views.check_out, name='check_out'),
 

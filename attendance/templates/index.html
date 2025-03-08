@@ -16,11 +16,28 @@
                     <h1 class="h4 text-gray-900 mb-4">Guard Management System</h1>
                     <hr>
                   </div>
-                  {% if error_message %}
-                  <div class="errorWrap"><strong>Error</strong>: {{ error_message }}</div>
-                  {% endif %}
                   <form class="user" method="post" action="">
                     {% csrf_token %}
+                    <div class="col-lg">
+                      {% for m in messages %}
+                      {% if m.tags == 'error' %}
+                      
+                      <div class="alert alert-danger alert-dismissible fade show"><strong>Info: </strong>{{m}}
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  
+                      </div>
+                      {% elif m.tags == 'success' %}
+                      <div class="alert alert-success alert-dismissible fade show"><strong>Info: </strong>{{m}}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                       </div>
+                       {%endif%}
+                      {%endfor%}
+          
+                    </div>
                     <div class="form-group mt-4">
                       <input type="text" class="form-control form-control-user" name="username" placeholder="Username (example: STD026)">
                     </div>

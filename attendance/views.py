@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate, login
 from attendance.decorators import login_required_superuser_required
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth 
+from django.contrib.auth.hashers import check_password, make_password
 # Create your views here.
 
 def index(request):
@@ -110,7 +111,7 @@ def add_guard(request):
         guard = Guard.objects.create(
             name=name,
             email=email,
-            image=image_url,
+            profile_pic=image_url,
             gender=gender,
             hire_date=hire_date,
             birth_date=dob,
@@ -214,6 +215,29 @@ def edit_location(request):
         'location': location
     }
     return render(request, 'admin/edit_location.html', context)
+
+@login_required_superuser_required
+def admin_change_password(request):
+    user = request.user
+    if request.method == "POST":
+        current_password = request.POST.get("old_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("c_password")
+
+        if not check_password(current_password, user.password):
+            messages.error(request, "Your current password is incorrect.")
+            return redirect("admin_change_password")
+
+        if new_password != confirm_password:
+            messages.error(request, "New password and confirm password do not match.")
+            return redirect("admin_change_password")
+
+        user.password = make_password(new_password)
+        user.save()
+        messages.success(request, "Your password has been updated successfully.")
+        return redirect("login")
+
+    return render(request, "admin/change_password.html")
 
 @login_required_superuser_required
 def shifts(request):
@@ -542,6 +566,29 @@ def guard_profile(request):
     guard = get_object_or_404(Guard, user=user)
     return render(request, 'employee/employee_profile.html',{"guard":guard})
 
+@login_required
+def change_password(request):
+    user = request.user
+    guard = get_object_or_404(Guard, user=user)
+    if request.method == "POST":
+        current_password = request.POST.get("old_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("c_password")
+
+        if not check_password(current_password, user.password):
+            messages.error(request, "Your current password is incorrect.")
+            return redirect("change_password")
+
+        if new_password != confirm_password:
+            messages.error(request, "New password and confirm password do not match.")
+            return redirect("change_password")
+
+        user.password = make_password(new_password)
+        user.save()
+        messages.success(request, "Your password has been updated successfully.")
+        return redirect("login")
+
+    return render(request, "employee/change_password.html",{"guard":guard})
 
 def logout(request):
     auth.logout(request)

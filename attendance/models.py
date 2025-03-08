@@ -1,6 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 # Create your models here.
+
+def validate_file_extension(value):
+    import os
+    allowed_extensions = ['jpg', 'jpeg', 'png', 'gif']
+    ext = os.path.splitext(value.name)[1]  # Get the file extension
+    if not ext.lower() in allowed_extensions:
+        raise ValidationError(f'Unsupported file extension. Only {", ".join(allowed_extensions)} files are allowed.')
+
 
 class Department(models.Model):
     id = models.AutoField(primary_key=True)
@@ -30,7 +39,7 @@ class Guard(models.Model):
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=128)
     gender = models.CharField(max_length=6)
-    image = models.ImageField(upload_to='guard_images',default='default.png')
+    profile_pic = models.FileField(default='static/images/pp/user-default-min.png', validators=[validate_file_extension])
     birth_date = models.DateField()
     hire_date = models.DateField()
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
