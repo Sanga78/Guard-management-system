@@ -1,4 +1,5 @@
-import datetime
+from django.utils import timezone
+from datetime import date, datetime
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import Attendance,Guard,Location,Shift,Department
 from django.contrib import messages
@@ -35,6 +36,7 @@ def index(request):
 
 @login_required_superuser_required
 def admin_dashboard(request):
+    active_guard_counts = Guard.objects.filter(user__isnull=False).count()
     department_guard_counts = Guard.objects.values('department__code', 'department__name').annotate(guard_count=Count('id'))
     shift_guard_counts = Guard.objects.values('shift__id', 'shift__start', 'shift__end').annotate(guard_count=Count('id'))
     context = {
@@ -45,7 +47,7 @@ def admin_dashboard(request):
         'shifts_count': Shift.objects.count(),
         'department_guard_counts': department_guard_counts,
         'shift_guard_counts': shift_guard_counts,
-        'active_user_counts': User.objects.count(),
+        'active_user_counts': active_guard_counts,
     }
     return render(request, "admin/admin_dashboard.html", context)
 
@@ -73,28 +75,42 @@ def add_guard(request):
         hire_date = request.POST.get("hire_date")
         department_id = request.POST.get("d_id")
         shift_id = request.POST.get("shift")
+        image = request.FILES['profile_pic']
 
+        if image:
+            fs = FileSystemStorage()
+            filename = fs.save(image.name, image)
+            image_url = fs.url(filename)
+        else:
+            image_url = ''
+        try:
+            dob_date = datetime.strptime(dob, '%Y-%m-%d').date()
+            today = date.today()
+            age = today.year - dob_date.year - ((today.month, today.day) < (dob_date.month, dob_date.day))
+
+            if age < 18:
+                messages.error(request, 'Guard must be at least 18 years old.')
+                return redirect('add_guard')
+        except ValueError:
+            messages.error(request, 'Invalid date of birth.')
+            return redirect('add_guard')
         if Guard.objects.filter(name=name).exists():
             messages.error(request, "Guard name already exists.")
             return redirect("add_guard")
 
-        if User.objects.filter(email=email).exists():
+        if Guard.objects.filter(email=email).exists():
             messages.error(request, "Email already exists.")
             return redirect("add_guard")
 
-        user = User.objects.create_user(username=email, email=email)
         department = Department.objects.get(pk=department_id)
         shift = Shift.objects.get(pk=shift_id)
-        profile_pic = request.FILES['profile_pic']
-        fs = FileSystemStorage()
-        filename = fs.save(profile_pic.name,profile_pic)
-        profile_pic_url = fs.url(filename)
 
+
+        # Create the Guard without a User
         guard = Guard.objects.create(
-            user=user,
             name=name,
             email=email,
-            image=profile_pic_url,
+            image=image_url,
             gender=gender,
             hire_date=hire_date,
             birth_date=dob,
@@ -102,12 +118,12 @@ def add_guard(request):
             shift=shift,
         )
 
-        messages.success(request, "Guard added successfully!")
+        messages.success(request, "Guard added successfully! User account will be created upon activation.")
         return redirect("add_guard")
 
     departments = Department.objects.all()
     shifts = Shift.objects.all()
-    return render(request, "admin/add_guard.html", {"departments": departments,"shifts": shifts})
+    return render(request, "admin/add_guard.html", {"departments": departments, "shifts": shifts})
 
 @login_required_superuser_required
 def edit_guard(request):
@@ -322,17 +338,20 @@ def list_users(request):
         user.delete()
         messages.success(request, f"{user.username} Has beed deleted!")
         return redirect('list_users')
-    users = User.objects.all().select_related('guard')
+    guards = Guard.objects.all().select_related('user', 'department', 'shift')
     context = {
-        'title': 'Data Table Users',
-        'users': users,
+        'title': 'Users',
+        'guards':guards
     }
     return render(request, 'admin/users.html', context)
 
 @login_required_superuser_required
-def add_user(request, guard_id, department_id):
+def add_user(request):
+    guard_id =None
+    if 'guard_id' in request.GET:
+        guard_id = request.GET.get('guard_id')
+    
     guard = get_object_or_404(Guard, id=guard_id)
-    department = get_object_or_404(Department, id=department_id)
     
     if request.method == 'POST':
         username = request.POST.get('u_username')
@@ -342,45 +361,18 @@ def add_user(request, guard_id, department_id):
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Username already exists!')
         else:
-            # Create the user
-            user = User.objects.create_user(username=username, password=password)
-            guard.user = user
+            email = guard.email
+            user = User.objects.create_user(username=username,email=email, password=password)
+            guard.user = user 
             guard.save()
-            messages.success(request, 'User created successfully!')
-            return redirect('data_table_users')
-    
-    context = {
-        'guard_id': guard_id,
-        'department_id': department_id,
-        'username': f"{guard.name}_{guard.id}",  # Example username
-    }
-    return render(request, 'add_user.html', context)
-
-def add_user(request, guard_id, department_id):
-    guard = get_object_or_404(Guard, id=guard_id)
-    department = get_object_or_404(Department, id=department_id)
-    
-    if request.method == 'POST':
-        username = request.POST.get('u_username')
-        password = request.POST.get('password')
-        
-        # Check if the username already exists
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists!')
-        else:
-            # Create the user
-            user = User.objects.create_user(username=username, password=password)
-            guard.user = user
-            guard.save()
-            messages.success(request, 'User created successfully!')
+            messages.success(request, 'User account created and activated successfully!')
             return redirect('list_users')
     
     context = {
         'guard_id': guard_id,
-        'department_id': department_id,
-        'username': f"{guard.name}_{guard.id}",  # Example username
+        'username': f"{guard.name}_{guard.id}",
     }
-    return render(request, 'admin/add_user.html', context)
+    return render(request, 'admin/add_users.html', context)
 
 @login_required_superuser_required
 def edit_user(request):
@@ -398,28 +390,157 @@ def edit_user(request):
         messages.success(request, 'User Details Updated successfully!')
         return redirect('list_users')
     
-    return render(request, 'admin/edit_user.html',{"user":user})
+    return render(request, 'admin/edit_users.html',{"user":user})
+
+@login_required_superuser_required
+def attendance_report(request):
+    title = "Attendance Report"
+    departments = Department.objects.all()
+    attendance = None
+    start = None
+    end = None
+    dept_code = None
+
+    if request.method == 'GET':
+        start = request.GET.get('start')
+        end = request.GET.get('end')
+        dept_code = request.GET.get('dept')
+
+        if start and end and dept_code:
+            # Convert start and end dates to timestamps
+            start_timestamp = int(timezone.datetime.strptime(start, "%Y-%m-%d").timestamp())
+            end_timestamp = int(timezone.datetime.strptime(end, "%Y-%m-%d").timestamp())
+
+            # Fetch attendance records based on the filters
+            attendance = Attendance.objects.filter(
+                in_time__range=(start_timestamp, end_timestamp),  # Use in_time for filtering
+                department_id=dept_code
+            ).select_related('guard', 'department', 'shift')
+
+            # Convert timestamps to datetime objects
+            for atd in attendance:
+                atd.date = datetime.fromtimestamp(atd.in_time)  # Add a `date` attribute
+                atd.check_in_time = datetime.fromtimestamp(atd.in_time)  # Add a `check_in_time` attribute
+                if atd.out_time != 0:
+                    atd.check_out_time = datetime.fromtimestamp(atd.out_time)  # Add a `check_out_time` attribute
+                else:
+                    atd.check_out_time = None
+
+    context = {
+        'title': title,
+        'departments': departments,
+        'attendance': attendance,
+        'start': start,
+        'end': end,
+        'dept_code': dept_code,
+    }
+    return render(request, 'admin/attendance_report.html', context)
+
+
+@login_required_superuser_required
+def generate_report(request, start, end, dept_code):
+    start_timestamp = int(timezone.datetime.strptime(start, "%Y-%m-%d").timestamp())
+    end_timestamp = int(timezone.datetime.strptime(end, "%Y-%m-%d").timestamp())
+
+    attendance = Attendance.objects.filter(
+        in_time__range=(start_timestamp, end_timestamp), 
+        department_id=dept_code
+    ).select_related('guard', 'department', 'shift')
+
+    for atd in attendance:
+        atd.date = datetime.fromtimestamp(atd.in_time) 
+        atd.check_in_time = datetime.fromtimestamp(atd.in_time)
+        if atd.out_time != 0:
+            atd.check_out_time = datetime.fromtimestamp(atd.out_time)
+        else:
+            atd.check_out_time = None
+
+    context = {
+        'dept_code': dept_code,
+        'start': start,
+        'end': end,
+        'attendance': attendance,
+    }
+    return render(request, 'admin/print_report.html', context)
 
 @login_required
 def guard_attendance(request):
+    if not request.user.is_authenticated or not hasattr(request.user, 'guard'):
+        return redirect('login')
+
+    guard = request.user.guard
+
+    today = datetime.today()
+    weekends = today.weekday() >= 5  # 5 = Saturday, 6 = Sunday
+
+    in_attendance = Attendance.objects.filter(guard=guard, out_time__isnull=True).exists()
+
+    locations = Location.objects.all()
+
     context = {
-        'weekends': datetime.today().weekday() >= 5,
-        'in': False,  # Example: Check if the guard is already checked in
-        'locations': Location.objects.all(),  # Fetch all locations
-        'disable': False,  # Example: Disable check-out button
+        'guard': guard,
+        'weekends': weekends,
+        'g_in': in_attendance,
+        'locations': locations,
+        'disable': False,  # Set this based on your logic (e.g., disable check-out after a certain time)
     }
-    return render(request,'employee/employee_attendance.html',context)
+
+    return render(request, 'employee/employee_attendance.html', context)
+
+@login_required
+def check_in(request):
+    if request.method == 'POST':
+        guard = get_object_or_404(Guard, user=request.user)
+        location_id = request.POST.get('location')
+        notes = request.POST.get('notes')
+        image = request.FILES.get('image')
+
+        # Save the image to the media directory
+        if image:
+            fs = FileSystemStorage()
+            filename = fs.save(image.name, image)
+            image_url = fs.url(filename)
+        else:
+            image_url = ''
+
+        # Create the attendance record
+        Attendance.objects.create(
+            guard=guard,
+            department=guard.department,
+            shift=guard.shift,
+            location_id=location_id,
+            in_time=int(timezone.now().timestamp()),  # Save timestamp
+            notes=notes,
+            image=image_url,
+            in_status='Present',  # Default status
+        )
+
+        messages.success(request, 'You have successfully checked in!')
+        return redirect('guard_attendance')
+
+    return redirect('guard_attendance')
+@login_required
+def check_out(request):
+    if request.method == 'POST':
+        guard = get_object_or_404(Guard, user=request.user)
+        attendance = Attendance.objects.filter(guard=guard, out_time__isnull=True).first()
+
+        if attendance:
+            attendance.out_time = int(timezone.now().timestamp())
+            attendance.out_status = 'Checked Out'
+            attendance.save()
+            messages.success(request, 'You have successfully checked out!')
+        else:
+            messages.error(request, 'No active check-in record found!')
+
+    return redirect('guard_attendance')
+
 
 @login_required
 def guard_profile(request):
     user = request.user
     guard = get_object_or_404(Guard, user=user)
-    return render(request, 'employee/employee_profile.html',{guard:"guard"})
-
-
-
-
-
+    return render(request, 'employee/employee_profile.html',{"guard":guard})
 
 
 def logout(request):

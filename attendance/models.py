@@ -15,7 +15,7 @@ class Shift(models.Model):
     start = models.TimeField()
     end = models.TimeField()
     def __str__(self):
-            return f"{self.start} to {self.end}"
+            return f"{self.start} - {self.end}"
 
 class Location(models.Model):
     id = models.AutoField(primary_key=True)
@@ -25,12 +25,12 @@ class Location(models.Model):
         return self.name
 
 class Guard(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=128)
-    gender = models.CharField(max_length=1)
-    image = models.CharField(max_length=128, default='images/pp/default.png')
+    gender = models.CharField(max_length=6)
+    image = models.ImageField(upload_to='guard_images',default='default.png')
     birth_date = models.DateField()
     hire_date = models.DateField()
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
@@ -51,8 +51,8 @@ class Attendance(models.Model):
     image = models.CharField(max_length=50, blank=True)
     lack_of = models.CharField(max_length=11, blank=True)
     in_status = models.CharField(max_length=15)
-    out_time = models.IntegerField()
-    out_status = models.CharField(max_length=15)
+    out_time = models.IntegerField(null=True, blank=True)  # Allow null values
+    out_status = models.CharField(max_length=15, blank=True)  # Allow blank values
 
 class AdminProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

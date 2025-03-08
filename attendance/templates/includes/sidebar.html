@@ -51,8 +51,8 @@
 
  <!-- Divider -->
  <hr class="sidebar-divider">
- <li class="nav-item">
-  <a class="nav-link" href="">
+ <li class="nav-item {% if request.resolver_match.url_name == 'attendance_report' %}active{% endif %}">
+  <a class="nav-link" href="{% url 'attendance_report' %}">
       <i class="fas fa-print"></i>
       <span>Print Report</span></a>
 </li>

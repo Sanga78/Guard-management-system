@@ -48,7 +48,7 @@
                                     {% if guard.user.username %}
                                         {{ guard.user.username }}
                                     {% else %}
-                                        <a href="{% url 'add_user' guard.id guard.department.id %}" class="btn btn-info">Create Account</a>
+                                        <a href="add_user?guard_id={{guard.id}}" class="btn btn-info">Create Account</a>
                                     {% endif %}
                                 </td>
                                 <td class="text-center align-middle">

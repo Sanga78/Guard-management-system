@@ -5,15 +5,32 @@
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Guard Dashboard</h1>
+        <h1 class="h3 mb-0 text-gray-800">Guard Attendance</h1>
     </div>
 
+    <div class="col-lg-5 offset-lg-4">
+        {% for m in messages %}
+        {% if m.tags == 'error' %}
+        
+        <div class="alert alert-danger alert-dismissible fade show"><strong>Info: </strong>{{m}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    
+     </div>
+     {% elif m.tags == 'success' %}
+     <div class="alert alert-success alert-dismissible fade show"><strong>Info: </strong>{{m}}
+         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+         </div>
+         {%endif%}
+        {%endfor%}
+      </div>
     <!-- Content Row -->
     <div class="row">
-
         <div class="col">
             <div class="row">
-
                 <!-- Area Chart -->
                 <div class="col-xl-12 col-lg-7">
                     <div class="card shadow mb-4" style="min-height: 543px">
@@ -24,16 +41,16 @@
                         <!-- Card Body -->
                         <div class="card-body">
                             {% if weekends %}
-                                <h1 class="text-center my-3">THANK YOU FOR THIS WEEK!</h1>
-                                <h5 class="card-title text-center mb-4 px-4">Have a Good Rest this <b>WEEKEND</b></h5>
-                                <b><p class="text-center text-primary pt-3">See You on Monday!</p></b>
-                                <div class="row">
-                                    <button disabled class="btn btn-danger btn-circle mx-auto" style="font-size: 35px; width: 200px; height: 200px">
-                                        <i class="fas fa-fw fa-sign-out-alt fa-2x"></i>
-                                    </button>
-                                </div>
+                            <h1 class="text-center my-3">THANK YOU FOR THIS WEEK!</h1>
+                            <h5 class="card-title text-center mb-4 px-4">Have a Good Rest this <b>WEEKEND</b></h5>
+                            <b><p class="text-center text-primary pt-3">See You on Monday!</p></b>
+                            <div class="row">
+                                <button disabled class="btn btn-danger btn-circle mx-auto" style="font-size: 35px; width: 200px; height: 200px">
+                                    <i class="fas fa-fw fa-sign-out-alt fa-2x"></i>
+                                </button>
+                            </div>
                             {% else %}
-                                {% if not in %}
+                                {% if not g_in %}
                                     <form method="post" action="{% url 'check_in' %}" enctype="multipart/form-data">
                                         {% csrf_token %}
                                         <div class="row mb-3">
@@ -45,7 +62,7 @@
                                                 <label for="location" class="col-form-label">Check In Location</label>
                                                 <select class="form-control" name="location" id="location">
                                                     {% for loc in locations %}
-                                                        <option value="{{ loc.id }}">{{ loc.id }} = {{ loc.name }}</option>
+                                                        <option value="{{ loc.id }}">{{ loc.name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -55,7 +72,7 @@
                                                 <div class="row col">
                                                     <label for="image" class="col-form-label float-left">Upload Your Image</label>
                                                 </div>
-                                                <img id="output" style="max-height: 252px;" class="img-thumbnail rounded mb-2" src="{{ default_image_url }}">
+                                                <img id="output" style="max-height: 252px;" class="img-thumbnail rounded mb-2" src="static/images/attendance/default.png">
                                                 <input type="file" class="d-block" id="image" name="image" accept="image/*" onchange="loadFile(event)">
                                                 <script>
                                                     var loadFile = function(event) {
@@ -83,12 +100,15 @@
                                     <h3 class="text-center my-3">THANK YOU FOR TODAY</h3>
                                     <h6 class="card-title text-center mb-4 px-4">The world of business survives less on leadership skills and more on the commitment and dedication of passionate employees like you.<br>Thank you for your hard work.</h6>
                                     {% if not disable %}
-                                        <b><p class="text-center text-primary pt-3">Check Out!</p></b>
-                                        <div class="row">
-                                            <a href="{% url 'check_out' %}" onclick="return confirm('Check out now? Make sure you are done with your work!')" class="btn btn-danger btn-circle mx-auto" style="font-size: 35px; width: 200px; height: 200px">
+                                    <b><p class="text-center text-primary pt-3">Check Out!</p></b>
+                                    <div class="row justify-content-center">
+                                        <form method="post" action="{% url 'check_out' %}" id="checkout-form">
+                                            {% csrf_token %}
+                                            <button type="button" class="btn btn-danger btn-circle mx-auto" style="font-size: 35px; width: 200px; height: 200px;" onclick="return confirm('Check out now? Make sure you are done with your work!')">
                                                 <i class="fas fa-fw fa-sign-out-alt fa-2x"></i>
-                                            </a>
-                                        </div>
+                                            </button>
+                                        </form>
+                                    </div>
                                     {% else %}
                                         <b><p class="text-center text-primary pt-3">See You Tomorrow!</p></b>
                                         <div class="row">
@@ -97,7 +117,7 @@
                                             </button>
                                         </div>
                                     {% endif %}
-                                {% endif %}
+                                {% endif %}                            
                             {% endif %}
                         </div>
                     </div>
