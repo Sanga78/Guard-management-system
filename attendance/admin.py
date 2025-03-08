@@ -2,9 +2,9 @@ from django.contrib import admin
 from .models import Department, Guard, Location, Shift, AdminProfile,Attendance
 
 
-admin.register(Department)
-admin.register(Guard)
-admin.register(Attendance)
-admin.register(Location)
-admin.register(Shift)
-admin.register(AdminProfile)
+admin.site.register(Department)
+admin.site.register(Guard)
+admin.site.register(Attendance)
+admin.site.register(Location)
+admin.site.register(Shift)
+admin.site.register(AdminProfile)
