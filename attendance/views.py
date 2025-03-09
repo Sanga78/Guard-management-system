@@ -16,9 +16,15 @@ from django.contrib.auth.hashers import check_password, make_password
 def index(request):
     next = request.GET.get('next') or None
     if request.method == "POST":
-        username = request.POST.get("username")
+        identifier = request.POST.get("username")
         password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
+        user = None
+
+        try:
+            user_obj = User.objects.get(email=identifier)
+            user = authenticate(request,username=user_obj.username,password=password)
+        except User.DoesNotExist:
+            user = authenticate(request, username=identifier, password=password)
         
         if user is not None:
             login(request, user)
