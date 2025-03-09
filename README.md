@@ -1,6 +1,3 @@
-Here’s a **README.md** file for your **Guard Management System**. This file provides an overview of the project, setup instructions, and other relevant details.
-
----
 
 # Guard Management System
 
@@ -197,4 +194,4 @@ For questions or feedback, please contact:
 
 ---
 
-This README provides a comprehensive overview of your **Guard Management System**. You can customize it further based on your project's specific needs. Let me know if you need additional sections or modifications!
+
