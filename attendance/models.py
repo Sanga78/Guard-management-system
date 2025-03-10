@@ -39,7 +39,7 @@ class Guard(models.Model):
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=128)
     gender = models.CharField(max_length=6)
-    profile_pic = models.FileField(default='static/images/pp/user-default-min.png', validators=[validate_file_extension])
+    profile_pic = models.FileField(default='guard_images/user-default-min.png', validators=[validate_file_extension],upload_to="guard_images")
     birth_date = models.DateField()
     hire_date = models.DateField()
     department = models.ForeignKey(Department, on_delete=models.CASCADE)

@@ -82,14 +82,8 @@ def add_guard(request):
         hire_date = request.POST.get("hire_date")
         department_id = request.POST.get("d_id")
         shift_id = request.POST.get("shift")
-        image = request.FILES['profile_pic']
+        image = request.FILES.get('profile_pic') 
 
-        if image:
-            fs = FileSystemStorage()
-            filename = fs.save(image.name, image)
-            image_url = fs.url(filename)
-        else:
-            image_url = ''
         try:
             dob_date = datetime.strptime(dob, '%Y-%m-%d').date()
             today = date.today()
@@ -112,12 +106,10 @@ def add_guard(request):
         department = Department.objects.get(pk=department_id)
         shift = Shift.objects.get(pk=shift_id)
 
-
-        # Create the Guard without a User
         guard = Guard.objects.create(
             name=name,
             email=email,
-            profile_pic=image_url,
+            profile_pic=image,  # If image is None, the model's default will be used
             gender=gender,
             hire_date=hire_date,
             birth_date=dob,
@@ -134,7 +126,7 @@ def add_guard(request):
 
 @login_required_superuser_required
 def edit_guard(request):
-    guardId =None
+    guardId = None
     if 'guardid' in request.GET:
         guardId = request.GET.get('guardid')
     guard = get_object_or_404(Guard, id=guardId)
@@ -142,31 +134,33 @@ def edit_guard(request):
     if request.method == 'POST':
         name = request.POST.get("guard_name")
         gender = request.POST.get("gender")
-        dob = request.POST.get("birth_date")
+        dob = request.POST.get("dob")
         hire_date = request.POST.get("hire_date")
         department_id = request.POST.get("department")
-        shift_id = request.POST.get("department")
-        profile_pic = request.FILES['profile_pic']
-        fs = FileSystemStorage()
-        filename = fs.save(profile_pic.name,profile_pic)
-        profile_pic_url = fs.url(filename)
+        shift_id = request.POST.get("shift")
+        profile_pic = request.FILES.get('profile_pic')
+        if profile_pic:
+            fs = FileSystemStorage()
+            filename = fs.save(profile_pic.name, profile_pic)
+            profile_pic_url = fs.url(filename)
+        else:
+            profile_pic_url = guard.profile_pic
 
+        guard.name = name
         guard.gender = gender
         guard.birth_date = dob
-        guard.image=profile_pic_url,
-        guard.name = name
+        guard.hire_date = hire_date 
         guard.department = get_object_or_404(Department, id=department_id)
         guard.shift = get_object_or_404(Shift, id=shift_id)
-        guard.hire_date= hire_date
+        guard.profile_pic = profile_pic_url
         guard.save()
-
-        messages.success(request, "Updated successfully ")
-        return redirect('edit_guard')
+        messages.success(request, "Updated successfully")
+        return redirect('guards')
     
     departments = Department.objects.all()
     shifts = Shift.objects.all()
     
-    return render(request, 'admin/edit_guard.html', {"guard":guard, "departments":departments,"shifts":shifts})
+    return render(request, 'admin/edit_guard.html', {"guard": guard, "departments": departments, "shifts": shifts})
 
 @login_required_superuser_required
 def locations(request):
@@ -264,7 +258,11 @@ def add_shift(request):
     if request.method == 'POST':
         shift_start = request.POST.get("s_start")
         shift_end = request.POST.get("s_end")
+
         if shift_start and shift_end:
+            if shift_start >= shift_end:
+                messages.error(request, "Shift start time must be before shift end time.")
+                return redirect('add_shift')
             try:
                 Shift.objects.create(
                     start=shift_start,
@@ -289,12 +287,24 @@ def edit_shift(request):
     if request.method == 'POST':
         shift_start = request.POST.get("s_start")
         shift_end = request.POST.get("s_end")
-        shift.start = shift_start
-        shift.end = shift_end
+
+        # Validate time inputs
+        if shift_start and shift_end:
+            if shift_start >= shift_end:
+                messages.error(request, "Shift start time must be before shift end time.")
+                return redirect('shifts')
+
+        # Update shift times only if new values are provided
+        if shift_start:
+            shift.start = shift_start
+        if shift_end:
+            shift.end = shift_end
+
         shift.save()
         messages.success(request, "Shift updated successfully!")
-        return redirect(f'/edit_shift?shiftid={shift_id}')
-    return render(request, 'admin/edit_shift.html', {'shift': shift})  
+        return redirect('shifts')
+
+    return render(request, 'admin/edit_shift.html', {'shift': shift})
 
 @login_required_superuser_required
 def department(request):
@@ -348,15 +358,10 @@ def edit_department(request):
 
     if request.method == "POST":
         dept_name = request.POST.get('deptname')
-        dept_code = request.POST.get('deptcode')
-        if Department.objects.filter(code=dept_code).exists() and dept_code != department.code:
-            messages.error(request, "Department Code already exists.")
-            return redirect("edit_department")
         department.name = dept_name
-        department.code = dept_code
         department.save()
         messages.success(request, "Department updated successfully!")
-        return redirect(f'/edit_department?deptid={dept_id}')
+        return redirect('departments')
 
     return render(request, 'admin/edit_department.html', {'department': department})
 
