@@ -104,7 +104,7 @@
                                     <div class="row justify-content-center">
                                         <form method="post" action="{% url 'check_out' %}" id="checkout-form">
                                             {% csrf_token %}
-                                            <button type="button" class="btn btn-danger btn-circle mx-auto" style="font-size: 35px; width: 200px; height: 200px;" onclick="return confirm('Check out now? Make sure you are done with your work!')">
+                                            <button type="submit" class="btn btn-danger btn-circle mx-auto" style="font-size: 35px; width: 200px; height: 200px;" onclick="return confirm('Check out now? Make sure you are done with your work!')">
                                                 <i class="fas fa-fw fa-sign-out-alt fa-2x"></i>
                                             </button>
                                         </form>
