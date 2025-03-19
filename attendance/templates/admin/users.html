@@ -31,7 +31,7 @@
                             <th>Guard ID</th>
                             <th>Name</th>
                             <th>Department</th>
-                            <th>Shift</th>
+                            <th>Location</th>
                             <th>Username</th>
                             <th>Actions</th>
                         </tr>
@@ -43,7 +43,7 @@
                                 <td class="align-middle">{{ guard.id }}</td>
                                 <td class="align-middle">{{ guard.name }}</td>
                                 <td class="align-middle">{{ guard.department.name }}</td>
-                                <td class="align-middle">{{ guard.shift.start }} to {{ guard.shift.end }}</td>
+                                <td class="align-middle">{{ guard.location.name }}</td>
                                 <td class="align-middle text-center">
                                     {% if guard.user.username %}
                                         {{ guard.user.username }}

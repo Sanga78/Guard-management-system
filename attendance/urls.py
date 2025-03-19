@@ -15,14 +15,11 @@ urlpatterns = [
         path('locations', views.locations, name='locations'),
         path('add_location', views.add_location, name='add_location'),
         path('edit_location', views.edit_location, name='edit_location'),
-        path('shifts', views.shifts, name='shifts'),
-        path('add_shift', views.add_shift, name='add_shift'),
-        path('edit_shift', views.edit_shift, name='edit_shift'),
         path('departments', views.department, name='departments'),
         path('add_department', views.add_department, name='add_department'),
         path('edit_department', views.edit_department, name='edit_department'),
         path('attendance-report', views.attendance_report, name='attendance_report'),
-        path('generate-report/<str:start>/<str:end>/<int:dept_code>/', views.generate_report, name='generate_report'),
+        path('generate-report/<str:location>/<int:dept_code>/', views.generate_report, name='generate_report'),
 
 
         #GUARD URLS

@@ -36,7 +36,7 @@
         <tr>
           <th>#</th>
           <th>Date</th>
-          <th>Shift</th>
+          <th>Location</th>
           <th>Check In</th>
           <th>Notes</th>
           <th>Lack Of</th>
@@ -53,7 +53,7 @@
                 <td colspan="8" class="text-center">OFF</td>
               {% else %}
               <td>{{ atd.date|date:"l, d F Y" }}</td>
-              <td>{{ atd.shift }}</td>
+              <td>{{ atd.location.name }}</td>
               <td>{{ atd.check_in_time|date:"H:i:s" }}</td>
               <td>
                 {% if atd.notes %}

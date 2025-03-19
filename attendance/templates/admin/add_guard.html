@@ -91,11 +91,11 @@
                       </div>
                     </div>
                     <div class="form-group row">
-                      <label for="s_id" class="col-form-label col-lg-4">Shift</label>
+                      <label for="l_id" class="col-form-label col-lg-4">Location</label>
                       <div class="col p-0">
-                        <select class="form-control" name="shift" id="s_id">
-                          {% for shift in shifts %}
-                            <option value="{{shift.id}}">{{ shift.start }} - {{ shift.end }}</option>
+                        <select class="form-control" name="location" id="l_id">
+                          {% for location in locations %}
+                            <option value="{{location.id}}">{{ location.name }}</option>
                           {%endfor%}
                         </select>
                       </div>

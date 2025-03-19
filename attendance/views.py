@@ -1,7 +1,7 @@
 from django.utils import timezone
 from datetime import date, datetime
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import Attendance,Guard,Location,Shift,Department
+from .models import Attendance,Guard,Location,Department
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
@@ -45,15 +45,14 @@ def index(request):
 def admin_dashboard(request):
     active_guard_counts = Guard.objects.filter(user__isnull=False).count()
     department_guard_counts = Guard.objects.values('department__code', 'department__name').annotate(guard_count=Count('id'))
-    shift_guard_counts = Guard.objects.values('shift__id', 'shift__start', 'shift__end').annotate(guard_count=Count('id'))
+    location_guard_counts = Guard.objects.values('location__id','location__name').annotate(guard_count=Count('id'))
     context = {
         'attendances_count': Attendance.objects.count(),
         'guards_count': Guard.objects.count(),
         'departments_count': Department.objects.count(),
         'locations_count': Location.objects.count(),
-        'shifts_count': Shift.objects.count(),
         'department_guard_counts': department_guard_counts,
-        'shift_guard_counts': shift_guard_counts,
+        'location_guard_counts': location_guard_counts,
         'active_user_counts': active_guard_counts,
     }
     return render(request, "admin/admin_dashboard.html", context)
@@ -81,7 +80,7 @@ def add_guard(request):
         dob = request.POST.get("dob")
         hire_date = request.POST.get("hire_date")
         department_id = request.POST.get("d_id")
-        shift_id = request.POST.get("shift")
+        location_id = request.POST.get("location")
         image = request.FILES.get('profile_pic') 
 
         try:
@@ -104,7 +103,7 @@ def add_guard(request):
             return redirect("add_guard")
 
         department = Department.objects.get(pk=department_id)
-        shift = Shift.objects.get(pk=shift_id)
+        location = Location.objects.get(pk=location_id)
 
         guard = Guard.objects.create(
             name=name,
@@ -114,15 +113,15 @@ def add_guard(request):
             hire_date=hire_date,
             birth_date=dob,
             department=department,
-            shift=shift,
+            location=location,
         )
 
         messages.success(request, "Guard added successfully! User account will be created upon activation.")
         return redirect("add_guard")
 
     departments = Department.objects.all()
-    shifts = Shift.objects.all()
-    return render(request, "admin/add_guard.html", {"departments": departments, "shifts": shifts})
+    locations = Location.objects.all()
+    return render(request, "admin/add_guard.html", {"departments": departments, "locations": locations})
 
 @login_required_superuser_required
 def edit_guard(request):
@@ -137,7 +136,7 @@ def edit_guard(request):
         dob = request.POST.get("dob")
         hire_date = request.POST.get("hire_date")
         department_id = request.POST.get("department")
-        shift_id = request.POST.get("shift")
+        location_id = request.POST.get("location")
         profile_pic = request.FILES.get('profile_pic')
         if profile_pic:
             fs = FileSystemStorage()
@@ -151,16 +150,16 @@ def edit_guard(request):
         guard.birth_date = dob
         guard.hire_date = hire_date 
         guard.department = get_object_or_404(Department, id=department_id)
-        guard.shift = get_object_or_404(Shift, id=shift_id)
+        guard.location = get_object_or_404(Location, id=location_id)
         guard.profile_pic = profile_pic_url
         guard.save()
         messages.success(request, "Updated successfully")
         return redirect('guards')
     
     departments = Department.objects.all()
-    shifts = Shift.objects.all()
+    locations = Location.objects.all()
     
-    return render(request, 'admin/edit_guard.html', {"guard": guard, "departments": departments, "shifts": shifts})
+    return render(request, 'admin/edit_guard.html', {"guard": guard, "departments": departments, "locations": locations})
 
 @login_required_superuser_required
 def locations(request):
@@ -240,73 +239,6 @@ def admin_change_password(request):
     return render(request, "admin/change_password.html")
 
 @login_required_superuser_required
-def shifts(request):
-    if 'del' in request.GET:
-        shift_id = request.GET['del']
-        shift = get_object_or_404(Shift, pk=shift_id)
-        shift.delete()
-        messages.success(request, "The selected shift has been deleted.")
-        return redirect('shifts')
-    shifts = Shift.objects.all()
-    context = {
-        'shifts': shifts
-    }
-    return render(request,"admin/shifts.html",context)
-
-@login_required_superuser_required
-def add_shift(request):
-    if request.method == 'POST':
-        shift_start = request.POST.get("s_start")
-        shift_end = request.POST.get("s_end")
-
-        if shift_start and shift_end:
-            if shift_start >= shift_end:
-                messages.error(request, "Shift start time must be before shift end time.")
-                return redirect('add_shift')
-            try:
-                Shift.objects.create(
-                    start=shift_start,
-                    end=shift_end
-                )
-                messages.success(request, "Shift Created Successfully")
-                return redirect("shifts")
-            except Exception as e:
-                messages.error(request, f"Something went wrong: {e}")
-        else:
-            messages.error(request, "All fields are required.")
-    context = {
-        'title': 'Add New Shift',
-    }
-    return render(request, 'admin/add_shift.html', context)
-
-@login_required_superuser_required
-def edit_shift(request):
-    shift_id = request.GET.get('shiftid')
-    shift = get_object_or_404(Shift, id=shift_id)
-
-    if request.method == 'POST':
-        shift_start = request.POST.get("s_start")
-        shift_end = request.POST.get("s_end")
-
-        # Validate time inputs
-        if shift_start and shift_end:
-            if shift_start >= shift_end:
-                messages.error(request, "Shift start time must be before shift end time.")
-                return redirect('shifts')
-
-        # Update shift times only if new values are provided
-        if shift_start:
-            shift.start = shift_start
-        if shift_end:
-            shift.end = shift_end
-
-        shift.save()
-        messages.success(request, "Shift updated successfully!")
-        return redirect('shifts')
-
-    return render(request, 'admin/edit_shift.html', {'shift': shift})
-
-@login_required_superuser_required
 def department(request):
     if 'del' in request.GET:
         department_id = request.GET['del']
@@ -373,7 +305,7 @@ def list_users(request):
         user.delete()
         messages.success(request, f"{user.username} Has beed deleted!")
         return redirect('list_users')
-    guards = Guard.objects.all().select_related('user', 'department', 'shift')
+    guards = Guard.objects.all().select_related('user', 'department', 'location')
     context = {
         'title': 'Users',
         'guards':guards
@@ -432,25 +364,20 @@ def attendance_report(request):
     title = "Attendance Report"
     departments = Department.objects.all()
     attendance = None
-    start = None
-    end = None
+    locations = Location.objects.all()
     dept_code = None
 
     if request.method == 'GET':
-        start = request.GET.get('start')
-        end = request.GET.get('end')
+        location = request.GET.get('location')
         dept_code = request.GET.get('dept')
 
-        if start and end and dept_code:
-            # Convert start and end dates to timestamps
-            start_timestamp = int(timezone.datetime.strptime(start, "%Y-%m-%d").timestamp())
-            end_timestamp = int(timezone.datetime.strptime(end, "%Y-%m-%d").timestamp())
+        if location and dept_code:
 
             # Fetch attendance records based on the filters
             attendance = Attendance.objects.filter(
-                in_time__range=(start_timestamp, end_timestamp),  # Use in_time for filtering
+                location = location,
                 department_id=dept_code
-            ).select_related('guard', 'department', 'shift')
+            ).select_related('guard', 'department', 'location')
 
             # Convert timestamps to datetime objects
             for atd in attendance:
@@ -465,22 +392,19 @@ def attendance_report(request):
         'title': title,
         'departments': departments,
         'attendance': attendance,
-        'start': start,
-        'end': end,
+        'locations': locations,
         'dept_code': dept_code,
     }
     return render(request, 'admin/attendance_report.html', context)
 
 
 @login_required_superuser_required
-def generate_report(request, start, end, dept_code):
-    start_timestamp = int(timezone.datetime.strptime(start, "%Y-%m-%d").timestamp())
-    end_timestamp = int(timezone.datetime.strptime(end, "%Y-%m-%d").timestamp())
+def generate_report(request, location, dept_code):
 
     attendance = Attendance.objects.filter(
-        in_time__range=(start_timestamp, end_timestamp), 
+        location=location, 
         department_id=dept_code
-    ).select_related('guard', 'department', 'shift')
+    ).select_related('guard', 'department', 'location')
 
     for atd in attendance:
         atd.date = datetime.fromtimestamp(atd.in_time) 
@@ -492,8 +416,7 @@ def generate_report(request, start, end, dept_code):
 
     context = {
         'dept_code': dept_code,
-        'start': start,
-        'end': end,
+        'location': location,
         'attendance': attendance,
     }
     return render(request, 'admin/print_report.html', context)
@@ -526,7 +449,6 @@ def guard_attendance(request):
 def check_in(request):
     if request.method == 'POST':
         guard = get_object_or_404(Guard, user=request.user)
-        location_id = request.POST.get('location')
         notes = request.POST.get('notes')
         image = request.FILES.get('image')
 
@@ -542,8 +464,7 @@ def check_in(request):
         Attendance.objects.create(
             guard=guard,
             department=guard.department,
-            shift=guard.shift,
-            location_id=location_id,
+            location_id=guard.location.id,
             in_time=int(timezone.now().timestamp()),  # Save timestamp
             notes=notes,
             image=image_url,

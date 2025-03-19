@@ -1,8 +1,6 @@
 {% extends 'includes/tables.html' %} 
 {% block main_content %}
-<!-- Begin Page Content -->
 <div class="container-fluid">
-    <!-- Page Heading -->
     <div class="row">
         <div class="col-lg">
             <h1 class="h1 mb-4 text-gray-900">{{ title }}</h1>
@@ -14,16 +12,18 @@
             <form action="" method="GET">
                 <div class="row">
                     <div class="col-3 offset-lg-1">
-                        <input type="date" name="start" class="form-control">
-                    </div>
-                    <div class="col-3">
-                        <input type="date" name="end" class="form-control">
+                        <select class="form-control" name="location">
+                            <option disabled selected>Location</option>
+                            {% for loc in locations %}
+                                <option value="{{ loc.id }}" {% if loc.id|stringformat:"s" == request.GET.location %}selected{% endif %}>{{ loc.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="col-3">
                         <select class="form-control" name="dept">
-                            <option disabled>Department</option>
+                            <option disabled selected>Department</option>
                             {% for dept in departments %}
-                                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                <option value="{{ dept.id }}" {% if dept.id|stringformat:"s" == request.GET.dept %}selected{% endif %}>{{ dept.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -34,9 +34,9 @@
             </form>
         </div>
     </div>
-    <!-- End of row show -->
+
     {% if not attendance %}
-        <h1>No Data, Please Pick Your Date and Department</h1>
+        <h1>No Data, Please Pick Your Location and Department</h1>
     {% else %}
         <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -50,7 +50,7 @@
                                 <th>#</th>
                                 <th>Date</th>
                                 <th>Name</th>
-                                <th>Shift</th>
+                                <th>Location</th>
                                 <th>Check In</th>
                                 <th>Notes</th>
                                 <th>Lack Of</th>
@@ -65,37 +65,13 @@
                                     <th>{{ forloop.counter }}</th>
                                     <td>{{ atd.date|date:"Y-m-d" }}</td>
                                     <td>{{ atd.guard.name }}</td>
-                                    <td>{{ atd.shift.id }}</td>
+                                    <td>{{ atd.location.name }}</td>
                                     <td>{{ atd.check_in_time|date:"H:i:s" }}</td>
-                                    <td>
-                                        {% if atd.notes %}
-                                            {{ atd.notes }}
-                                        {% else %}
-                                            Unfilled
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                      {% if atd.lack_of %}
-                                        {{ atd.lack_of }}
-                                      {% else %}
-                                          None
-                                      {% endif %}
-                                    </td>
+                                    <td>{{ atd.notes|default:"Unfilled" }}</td>
+                                    <td>{{ atd.lack_of|default:"None" }}</td>
                                     <td>{{ atd.in_status }}</td>
-                                    <td>
-                                      {% if atd.check_out_time %}
-                                          {{ atd.check_out_time|date:"H:i:s" }}
-                                      {% else %}
-                                          Haven't Checked Out
-                                      {% endif %}
-                                  </td>
-                                    <td>
-                                      {% if atd.out_status  %}
-                                        {{ atd.out_status }}
-                                      {% else %}
-                                          Haven't Checked Out
-                                      {% endif %}
-                                      </td>
+                                    <td>{{ atd.check_out_time|default:"Haven't Checked Out"|date:"H:i:s" }}</td>
+                                    <td>{{ atd.out_status|default:"Haven't Checked Out" }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -103,10 +79,9 @@
                 </div>
             </div>
         </div>
-        <a href="{% url 'generate_report' start end dept_code %}" target="_blank" class="d-none d-sm-inline-block btn btn-sm btn-danger ml-2 shadow-sm float-right">
+        <a href="{% url 'generate_report' request.GET.location request.GET.dept %}" target="_blank" class="d-none d-sm-inline-block btn btn-sm btn-danger ml-2 shadow-sm float-right">
             <i class="fas fa-download fa-sm text-white"></i> Generate Report
         </a>
     {% endif %}
 </div>
-<!-- /.container-fluid -->
 {% endblock main_content %}

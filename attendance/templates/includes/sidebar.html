@@ -28,11 +28,6 @@
           <i class="fas fa-building"></i>
           <span>Departments</span></a>
   </li>
-  <li class="nav-item {% if request.resolver_match.url_name == 'shifts' %}active{% endif %}">
-    <a class="nav-link" href="{% url 'shifts' %}">
-        <i class="fas fa-exchange-alt"></i>
-        <span>Shifts</span></a>
-  </li>
   <li class="nav-item {% if request.resolver_match.url_name == 'guards' %}active{% endif %}">
     <a class="nav-link" href="{% url 'guards' %}">
         <i class="fas fa-id-badge"></i>

@@ -85,10 +85,10 @@
               <div class="row">
                 <div class="col-lg-6">
                   <div class="form-group">
-                    <label for="s_id" class="col-form-label">Shift</label>
-                    <select class="form-control" name="shift" id="s_id">
-                      {% for shift in shifts %}
-                        <option value="{{ shift.id }}" {% if shift.id == guard.shift.id %} selected {% endif %}>{{ shift.start }} to {{ shift.end }}</option>
+                    <label for="s_id" class="col-form-label">Location</label>
+                    <select class="form-control" name="location" id="s_id">
+                      {% for location in locations %}
+                        <option value="{{ location.id }}" {% if location.id == guard.location.id %} selected {% endif %}>{{ location.name }}</option>
                       {% endfor %}
                     </select>
                   </div>

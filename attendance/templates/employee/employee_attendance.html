@@ -55,16 +55,8 @@
                                         {% csrf_token %}
                                         <div class="row mb-3">
                                             <div class="col-lg-5">
-                                                <label for="work_shift" class="col-form-label">Work Shift</label>
-                                                <input class="form-control" type="text" placeholder="{{ guard.shift }}" value="{{ guard.shift }}" name="work_shift" readonly>
-                                            </div>
-                                            <div class="col-lg-5 offset-lg-1">
-                                                <label for="location" class="col-form-label">Check In Location</label>
-                                                <select class="form-control" name="location" id="location">
-                                                    {% for loc in locations %}
-                                                        <option value="{{ loc.id }}">{{ loc.name }}</option>
-                                                    {% endfor %}
-                                                </select>
+                                                <label for="location_id" class="col-form-label">Location</label>
+                                                <input class="form-control" type="text" placeholder="{{ guard.location }}" value="{{ guard.location }}" name="location_id" readonly>
                                             </div>
                                         </div>
                                         <div class="row mb-3">

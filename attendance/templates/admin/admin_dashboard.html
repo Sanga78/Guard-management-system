@@ -33,8 +33,8 @@
               <div class="card-body">
                 <div class="row no-gutters align-items-center">
                   <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Working Shifts</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{shifts_count}} Shifts</div>
+                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Locations</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{locations_count}} Locations</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-exchange-alt fa-2x text-gray-300"></i>
@@ -130,7 +130,7 @@
               <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Employees per Shift</h6>
+                  <h6 class="m-0 font-weight-bold text-primary">Guards per Location</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body" style="max-height: 370px;">
@@ -138,16 +138,16 @@
                     <thead class="bg-info text-white">
                       <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Shift Code</th>
+                        <th scope="col">Location</th>
                         <th scope="col">Guards</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {% for shift in shift_guard_counts %}
+                      {% for location in location_guard_counts %}
                         <tr>
                           <th scope="row">{{ forloop.counter }}</th>
-                          <td>{{ shift.shift__start }} - {{ shift.shift__end }}</td>
-                          <td>{{ shift.guard_count }}</td>
+                          <td>{{ location.location__name}}</td>
+                          <td>{{ location.guard_count }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
