@@ -425,16 +425,20 @@ def attendance_report(request):
 
 @login_required_superuser_required
 def generate_report(request, location, dept_code):
-
     attendance = Attendance.objects.filter(
         location=location, 
         department_id=dept_code
     ).select_related('guard', 'department', 'location')
 
     for atd in attendance:
-        atd.date = datetime.fromtimestamp(atd.in_time) 
-        atd.check_in_time = datetime.fromtimestamp(atd.in_time)
-        if atd.out_time != 0:
+        if atd.in_time is not None:
+            atd.date = datetime.fromtimestamp(atd.in_time) 
+            atd.check_in_time = datetime.fromtimestamp(atd.in_time)
+        else:
+            atd.date = None
+            atd.check_in_time = None
+        
+        if atd.out_time is not None and atd.out_time != 0:
             atd.check_out_time = datetime.fromtimestamp(atd.out_time)
         else:
             atd.check_out_time = None

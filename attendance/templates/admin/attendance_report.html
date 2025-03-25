@@ -87,11 +87,11 @@
                                     <td>{{ atd.out_status|default:"Haven't Checked Out" }}</td>
                                     <td>
                                         {% if atd.status == 1 %}
-                                            <span class="badge badge-success">Approved</span>
+                                            <span class="badge badge-success p-2 font-weight-bold">Approved</span>
                                         {% elif atd.status == 2 %}
-                                            <span class="badge badge-danger">Rejected</span>
+                                            <span class="badge badge-danger p-2 font-weight-bold">Rejected</span>
                                         {% else %}
-                                            <span class="badge badge-warning">Pending</span>
+                                            <span class="badge badge-warning p-2 font-weight-bold">Pending</span>
                                                 <td colspan="12">
                                                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">SET ACTION</button>
                                                 
