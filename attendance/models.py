@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 def validate_file_extension(value):
     import os
     allowed_extensions = ['jpg', 'jpeg', 'png', 'gif']
-    ext = os.path.splitext(value.name)[1]  # Get the file extension
+    ext = os.path.splitext(value.name)[1]
     if not ext.lower() in allowed_extensions:
         raise ValidationError(f'Unsupported file extension. Only {", ".join(allowed_extensions)} files are allowed.')
 
@@ -52,8 +52,16 @@ class Attendance(models.Model):
     image = models.CharField(max_length=50, blank=True)
     lack_of = models.CharField(max_length=11, blank=True)
     in_status = models.CharField(max_length=15)
-    out_time = models.IntegerField(null=True, blank=True)  # Allow null values
-    out_status = models.CharField(max_length=15, blank=True)  # Allow blank values
+    out_time = models.IntegerField(null=True, blank=True)
+    out_status = models.CharField(max_length=15, blank=True)   
+    admin_remark = models.TextField(null=True, blank=True)
+    admin_remark_date = models.DateTimeField(null=True, blank=True)
+    status = models.IntegerField(choices=[
+        (0, 'Pending'),
+        (1, 'Approved'),
+        (2, 'Rejected')
+    ])
+
 
 class AdminProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

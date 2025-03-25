@@ -57,6 +57,13 @@
                                 <th>In Status</th>
                                 <th>Check Out</th>
                                 <th>Out Status</th>
+                                <th>Status</th>
+                                {% if atd.status == 1 %}
+                            {% elif atd.status == 2 %}
+                            {% else %}
+                            <th>Action</th>
+                            {% endif %}
+
                             </tr>
                         </thead>
                         <tbody>
@@ -70,8 +77,60 @@
                                     <td>{{ atd.notes|default:"Unfilled" }}</td>
                                     <td>{{ atd.lack_of|default:"None" }}</td>
                                     <td>{{ atd.in_status }}</td>
-                                    <td>{{ atd.check_out_time|default:"Haven't Checked Out"|date:"H:i:s" }}</td>
+                                    <td>
+                                        {% if atd.check_out_time %}
+                                            {{ atd.check_out_time|date:"H:i:s" }}
+                                        {% else %}
+                                            Haven't Checked Out
+                                        {% endif %}
+                                    </td>                                 
                                     <td>{{ atd.out_status|default:"Haven't Checked Out" }}</td>
+                                    <td>
+                                        {% if atd.status == 1 %}
+                                            <span class="badge badge-success">Approved</span>
+                                        {% elif atd.status == 2 %}
+                                            <span class="badge badge-danger">Rejected</span>
+                                        {% else %}
+                                            <span class="badge badge-warning">Pending</span>
+                                                <td colspan="12">
+                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">SET ACTION</button>
+                                                
+                                                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLabel">SET ACTION</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                    
+                                                    <form method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="attendance_id" value="{{ atd.id }}">                                                    
+                                                    <div class="modal-body">
+                                                    
+                                                        <select class="custom-select" name="status" required="">
+                                                            <option value="">Choose...</option>
+                                                            <option value="1">Approve</option>
+                                                            <option value="2">Decline</option>
+                                                        </select></p>
+                                                        <br>
+                                                        <p><textarea id="textarea1" name="description" class="form-control" name="description" placeholder="Description" row="5" maxlength="500" required></textarea></p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-success" name="update">Apply</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                    
+                                                </td>
+                                                </form>
+                                        {% endif %}
+                                    </td>
+
                                 </tr>
                             {% endfor %}
                         </tbody>

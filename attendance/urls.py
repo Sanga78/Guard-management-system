@@ -20,7 +20,7 @@ urlpatterns = [
         path('edit_department', views.edit_department, name='edit_department'),
         path('attendance-report', views.attendance_report, name='attendance_report'),
         path('generate-report/<str:location>/<int:dept_code>/', views.generate_report, name='generate_report'),
-
+        
 
         #GUARD URLS
         path('guard_attendance', views.guard_attendance, name='guard_attendance'),

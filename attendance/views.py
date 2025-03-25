@@ -11,6 +11,7 @@ from attendance.decorators import login_required_superuser_required
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth 
 from django.contrib.auth.hashers import check_password, make_password
+from django.utils.timezone import now
 # Create your views here.
 
 def index(request):
@@ -363,40 +364,64 @@ def edit_user(request):
 def attendance_report(request):
     title = "Attendance Report"
     departments = Department.objects.all()
-    attendance = None
     locations = Location.objects.all()
+    attendance = None
     dept_code = None
 
     if request.method == 'GET':
         location = request.GET.get('location')
         dept_code = request.GET.get('dept')
 
-        if location and dept_code:
+        try:
+            location = int(location) if location else None
+            dept_code = int(dept_code) if dept_code else None
+        except ValueError:
+            location = None
+            dept_code = None
 
-            # Fetch attendance records based on the filters
+        if location is not None and dept_code is not None:
             attendance = Attendance.objects.filter(
-                location = location,
-                department_id=dept_code
+                location_id=location,
+                department_id=dept_code 
             ).select_related('guard', 'department', 'location')
 
-            # Convert timestamps to datetime objects
             for atd in attendance:
-                atd.date = datetime.fromtimestamp(atd.in_time)  # Add a `date` attribute
-                atd.check_in_time = datetime.fromtimestamp(atd.in_time)  # Add a `check_in_time` attribute
-                if atd.out_time != 0:
-                    atd.check_out_time = datetime.fromtimestamp(atd.out_time)  # Add a `check_out_time` attribute
-                else:
-                    atd.check_out_time = None
+                atd.date = datetime.fromtimestamp(atd.in_time)
+                atd.check_in_time = datetime.fromtimestamp(atd.in_time)
+                atd.check_out_time = (
+                    datetime.fromtimestamp(atd.out_time) if atd.out_time else None
+                )
+
+    if request.method == "POST":
+        attendance_id = request.POST.get("attendance_id") 
+        status = request.POST.get("status")
+        description = request.POST.get("description")
+
+        if not attendance_id:
+            messages.error(request, "Invalid attendance ID.")
+            return redirect("attendance_report")
+
+        attendance_record = get_object_or_404(Attendance, id=attendance_id)
+
+        if status and description:
+            attendance_record.status = int(status)
+            attendance_record.admin_remark = description
+            attendance_record.admin_remark_date = now()
+            attendance_record.save()
+            messages.success(request, "Attendance status updated successfully.")
+        else:
+            messages.error(request, "Please provide all required fields.")
+
+        return redirect("attendance_report")
 
     context = {
-        'title': title,
-        'departments': departments,
-        'attendance': attendance,
-        'locations': locations,
-        'dept_code': dept_code,
+        "title": title,
+        "departments": departments,
+        "attendance": attendance,
+        "locations": locations,
+        "dept_code": dept_code,
     }
-    return render(request, 'admin/attendance_report.html', context)
-
+    return render(request, "admin/attendance_report.html", context)
 
 @login_required_superuser_required
 def generate_report(request, location, dept_code):
@@ -429,7 +454,7 @@ def guard_attendance(request):
     guard = request.user.guard
 
     today = datetime.today()
-    weekends = today.weekday() >= 5  # 5 = Saturday, 6 = Sunday
+    weekends = today.weekday() >= 5
 
     in_attendance = Attendance.objects.filter(guard=guard, out_time__isnull=True).exists()
 
@@ -440,7 +465,7 @@ def guard_attendance(request):
         'weekends': weekends,
         'g_in': in_attendance,
         'locations': locations,
-        'disable': False,  # Set this based on your logic (e.g., disable check-out after a certain time)
+        'disable': False,
     }
 
     return render(request, 'employee/employee_attendance.html', context)
@@ -451,8 +476,6 @@ def check_in(request):
         guard = get_object_or_404(Guard, user=request.user)
         notes = request.POST.get('notes')
         image = request.FILES.get('image')
-
-        # Save the image to the media directory
         if image:
             fs = FileSystemStorage()
             filename = fs.save(image.name, image)
@@ -460,15 +483,15 @@ def check_in(request):
         else:
             image_url = ''
 
-        # Create the attendance record
         Attendance.objects.create(
             guard=guard,
             department=guard.department,
             location_id=guard.location.id,
-            in_time=int(timezone.now().timestamp()),  # Save timestamp
+            in_time=int(timezone.now().timestamp()),
             notes=notes,
             image=image_url,
-            in_status='Present',  # Default status
+            in_status='Present',
+            status=0,
         )
 
         messages.success(request, 'You have successfully checked in!')
